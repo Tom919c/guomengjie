@@ -2,8 +2,8 @@
   "use strict";
 
   var defaults = {
-    recipientName: "你",
-    senderName: "我",
+    recipientName: "豆豆同学",
+    senderName: "陈权",
     examName: "考试",
     openingLine: "你正在一步一步接近想要的结果。",
     customWish: "愿你稳定发挥，考的都会，蒙的都对！",
@@ -119,20 +119,70 @@
     return button;
   }
 
+  function randomBetween(min, max) {
+    return min + Math.random() * (max - min);
+  }
+
   function burstSpark(count) {
-    var icons = ["✨", "🌟", "💖", "🍀"];
-    var pieces = count || 10;
+    var icons = ["✨", "🌟", "💫", "⭐", "💖", "💕", "🍀"];
+    var pieces = Math.max(1, Number(count) || 10);
+    var centerX = randomBetween(44, 56);
+    var centerY = randomBetween(77, 84);
+    var reducedMotion =
+      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var fragment = document.createDocumentFragment();
+
+    cardEl.classList.remove("card-burst");
+    // 触发重绘后重新加 class，确保连续点击也能看到脉冲光效
+    void cardEl.offsetWidth;
+    cardEl.classList.add("card-burst");
+    setTimeout(function () {
+      cardEl.classList.remove("card-burst");
+    }, 460);
+
     for (var i = 0; i < pieces; i += 1) {
+      var angle = randomBetween(-150, -30) * (Math.PI / 180);
+      var distance = randomBetween(95, 220) + pieces * 1.5;
+      var driftX = Math.cos(angle) * distance + randomBetween(-16, 16);
+      var driftY = Math.sin(angle) * distance;
+      var size = randomBetween(16, 29);
+      var duration = reducedMotion ? randomBetween(420, 680) : randomBetween(980, 1700);
+      var delay = randomBetween(0, 170);
+      var endScale = randomBetween(0.95, 1.55);
+      var spin = randomBetween(-36, 36);
+      var blur = Math.random() > 0.82 ? randomBetween(0.6, 1.3) : 0;
+      var glow = randomBetween(0.22, 0.48);
       var item = document.createElement("span");
       item.className = "float-item";
-      item.style.left = 8 + Math.random() * 84 + "%";
-      item.style.animationDelay = Math.random() * 0.2 + "s";
+      if (Math.random() > 0.55) {
+        item.classList.add("float-item--twinkle");
+      }
+      if (Math.random() > 0.86) {
+        item.classList.add("float-item--soft");
+      }
+
+      item.style.setProperty("--x", centerX + randomBetween(-8, 8) + "%");
+      item.style.setProperty("--y", centerY + randomBetween(-4, 4) + "%");
+      item.style.setProperty("--tx", driftX.toFixed(1) + "px");
+      item.style.setProperty("--ty", driftY.toFixed(1) + "px");
+      item.style.setProperty("--rotate", spin.toFixed(1) + "deg");
+      item.style.setProperty("--dur", Math.round(duration) + "ms");
+      item.style.setProperty("--delay", Math.round(delay) + "ms");
+      item.style.setProperty("--size", size.toFixed(1) + "px");
+      item.style.setProperty("--scale", endScale.toFixed(2));
+      item.style.setProperty("--blur", blur.toFixed(2) + "px");
+      item.style.setProperty("--glow", glow.toFixed(2));
       item.textContent = icons[Math.floor(Math.random() * icons.length)];
-      cardEl.appendChild(item);
       item.addEventListener("animationend", function (event) {
+        if (event.animationName !== "spark-flight") {
+          return;
+        }
         event.target.remove();
       });
+      fragment.appendChild(item);
     }
+
+    cardEl.appendChild(fragment);
   }
 
   function handleAction(action) {
@@ -203,7 +253,7 @@
 
     if (scene.type === "tap") {
       renderTapScene(scene);
-      setHint("连续点击，给她攒满好运值。", false);
+      setHint("连续点击，攒满好运值。", false);
     } else {
       renderChoiceScene(scene);
       if (sceneId !== "ending") {
@@ -213,7 +263,7 @@
 
     if (sceneId === "ending") {
       burstSpark(20);
-      setHint("可以点“再收一波好运”，也可以直接发给她。", true);
+      setHint("可以点“再收一波好运”哦", true);
       restartBtn.hidden = false;
     } else {
       restartBtn.hidden = true;
