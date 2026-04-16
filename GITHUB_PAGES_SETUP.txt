@@ -1,0 +1,12 @@
+GitHub Pages 发布步骤（静态 H5）
+
+1. 在 GitHub 新建一个仓库，把当前目录文件推送到 main 分支。
+2. 打开仓库 Settings -> Pages。
+3. Source 选择 "Deploy from a branch"。
+4. Branch 选择 "main" 和 "/(root)"，点击 Save。
+5. 等 1-3 分钟，页面会生成一个 https://<用户名>.github.io/<仓库名>/ 的链接。
+6. 把这个链接发到微信即可让她直接打开互动页。
+
+建议：
+- 首次分享前先在手机微信里打开一次，确认文字内容和名字都正确。
+- 如果改了文案，重新 push 后等待 Pages 自动更新即可。
