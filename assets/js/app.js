@@ -25,6 +25,7 @@
   var hintTextEl = document.getElementById("hintText");
   var restartBtn = document.getElementById("restartBtn");
   var cardEl = document.getElementById("card");
+  var fxLayer = ensureFxLayer();
 
   var scenes = {
     intro: {
@@ -123,14 +124,98 @@
     return min + Math.random() * (max - min);
   }
 
+  function ensureFxLayer() {
+    var layer = document.getElementById("fxLayer");
+    if (!layer) {
+      layer = document.createElement("div");
+      layer.id = "fxLayer";
+      layer.className = "fx-layer";
+      document.body.appendChild(layer);
+    }
+    return layer;
+  }
+
+  function createSparkItem(options) {
+    var item = document.createElement("span");
+    item.className = "float-item";
+
+    if (options.fullscreen) {
+      item.classList.add("float-item--fullscreen");
+    }
+    if (Math.random() > 0.45) {
+      item.classList.add("float-item--twinkle");
+    }
+    if (Math.random() > 0.82) {
+      item.classList.add("float-item--soft");
+    }
+    if (Math.random() > 0.72) {
+      item.classList.add("float-item--mega");
+    }
+
+    item.style.setProperty("--x", options.startX.toFixed(2) + "%");
+    item.style.setProperty("--y", options.startY.toFixed(2) + "%");
+    item.style.setProperty("--tx", options.tx.toFixed(1) + "px");
+    item.style.setProperty("--ty", options.ty.toFixed(1) + "px");
+    item.style.setProperty("--rotate", options.rotate.toFixed(1) + "deg");
+    item.style.setProperty("--dur", Math.round(options.duration) + "ms");
+    item.style.setProperty("--delay", Math.round(options.delay) + "ms");
+    item.style.setProperty("--size", options.size.toFixed(1) + "px");
+    item.style.setProperty("--scale", options.scale.toFixed(2));
+    item.style.setProperty("--blur", options.blur.toFixed(2) + "px");
+    item.style.setProperty("--glow", options.glow.toFixed(2));
+    item.textContent = options.icons[Math.floor(Math.random() * options.icons.length)];
+    item.addEventListener("animationend", function (event) {
+      if (event.animationName !== "spark-flight") {
+        return;
+      }
+      event.target.remove();
+    });
+
+    return item;
+  }
+
   function burstSpark(count) {
-    var icons = ["✨", "🌟", "💫", "⭐", "💖", "💕", "🍀"];
-    var pieces = Math.max(1, Number(count) || 10);
+    var icons = [
+      "✨",
+      "🌟",
+      "💫",
+      "⭐",
+      "🌠",
+      "💖",
+      "💕",
+      "💗",
+      "💓",
+      "💞",
+      "💝",
+      "🍀",
+      "☘️",
+      "🌸",
+      "💐",
+      "🌈",
+      "🎈",
+      "🎉",
+      "🎊",
+      "🪄",
+      "🫧",
+      "🦋",
+      "🪽",
+      "🎓",
+      "📚",
+      "📝",
+      "🏅",
+      "🏆",
+      "🎯",
+      "✅"
+    ];
+    var base = Math.max(8, Number(count) || 10);
+    var localPieces = Math.min(42, Math.round(base * 1.9));
+    var screenPieces = Math.min(130, Math.round(base * 3.6));
     var centerX = randomBetween(44, 56);
     var centerY = randomBetween(77, 84);
     var reducedMotion =
       window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var fragment = document.createDocumentFragment();
+    var localFragment = document.createDocumentFragment();
+    var screenFragment = document.createDocumentFragment();
 
     cardEl.classList.remove("card-burst");
     // 触发重绘后重新加 class，确保连续点击也能看到脉冲光效
@@ -140,49 +225,73 @@
       cardEl.classList.remove("card-burst");
     }, 460);
 
-    for (var i = 0; i < pieces; i += 1) {
+    for (var i = 0; i < localPieces; i += 1) {
       var angle = randomBetween(-150, -30) * (Math.PI / 180);
-      var distance = randomBetween(95, 220) + pieces * 1.5;
+      var distance = randomBetween(120, 280) + base * 2.3;
       var driftX = Math.cos(angle) * distance + randomBetween(-16, 16);
       var driftY = Math.sin(angle) * distance;
-      var size = randomBetween(16, 29);
-      var duration = reducedMotion ? randomBetween(420, 680) : randomBetween(980, 1700);
+      var size = randomBetween(18, 32);
+      var duration = reducedMotion ? randomBetween(420, 760) : randomBetween(1000, 1850);
       var delay = randomBetween(0, 170);
-      var endScale = randomBetween(0.95, 1.55);
-      var spin = randomBetween(-36, 36);
-      var blur = Math.random() > 0.82 ? randomBetween(0.6, 1.3) : 0;
-      var glow = randomBetween(0.22, 0.48);
-      var item = document.createElement("span");
-      item.className = "float-item";
-      if (Math.random() > 0.55) {
-        item.classList.add("float-item--twinkle");
-      }
-      if (Math.random() > 0.86) {
-        item.classList.add("float-item--soft");
-      }
-
-      item.style.setProperty("--x", centerX + randomBetween(-8, 8) + "%");
-      item.style.setProperty("--y", centerY + randomBetween(-4, 4) + "%");
-      item.style.setProperty("--tx", driftX.toFixed(1) + "px");
-      item.style.setProperty("--ty", driftY.toFixed(1) + "px");
-      item.style.setProperty("--rotate", spin.toFixed(1) + "deg");
-      item.style.setProperty("--dur", Math.round(duration) + "ms");
-      item.style.setProperty("--delay", Math.round(delay) + "ms");
-      item.style.setProperty("--size", size.toFixed(1) + "px");
-      item.style.setProperty("--scale", endScale.toFixed(2));
-      item.style.setProperty("--blur", blur.toFixed(2) + "px");
-      item.style.setProperty("--glow", glow.toFixed(2));
-      item.textContent = icons[Math.floor(Math.random() * icons.length)];
-      item.addEventListener("animationend", function (event) {
-        if (event.animationName !== "spark-flight") {
-          return;
-        }
-        event.target.remove();
-      });
-      fragment.appendChild(item);
+      var endScale = randomBetween(1, 1.72);
+      var spin = randomBetween(-48, 48);
+      var blur = Math.random() > 0.8 ? randomBetween(0.6, 1.5) : 0;
+      var glow = randomBetween(0.26, 0.56);
+      localFragment.appendChild(
+        createSparkItem({
+          icons: icons,
+          fullscreen: false,
+          startX: centerX + randomBetween(-8, 8),
+          startY: centerY + randomBetween(-4, 4),
+          tx: driftX,
+          ty: driftY,
+          rotate: spin,
+          duration: duration,
+          delay: delay,
+          size: size,
+          scale: endScale,
+          blur: blur,
+          glow: glow
+        })
+      );
     }
 
-    cardEl.appendChild(fragment);
+    for (var j = 0; j < screenPieces; j += 1) {
+      var startX = randomBetween(4, 96);
+      var startY = randomBetween(68, 98);
+      var screenAngle = randomBetween(-172, -8) * (Math.PI / 180);
+      var screenDistance = randomBetween(220, 560) + base * 2.8;
+      var screenX = Math.cos(screenAngle) * screenDistance + randomBetween(-24, 24);
+      var screenY = Math.sin(screenAngle) * screenDistance;
+      var screenSize = randomBetween(20, 38);
+      var screenDuration = reducedMotion ? randomBetween(560, 980) : randomBetween(1200, 2400);
+      var screenDelay = randomBetween(0, 260);
+      var screenScale = randomBetween(1.05, 1.95);
+      var screenRotate = randomBetween(-75, 75);
+      var screenBlur = Math.random() > 0.74 ? randomBetween(0.4, 1.8) : 0;
+      var screenGlow = randomBetween(0.3, 0.64);
+
+      screenFragment.appendChild(
+        createSparkItem({
+          icons: icons,
+          fullscreen: true,
+          startX: startX,
+          startY: startY,
+          tx: screenX,
+          ty: screenY,
+          rotate: screenRotate,
+          duration: screenDuration,
+          delay: screenDelay,
+          size: screenSize,
+          scale: screenScale,
+          blur: screenBlur,
+          glow: screenGlow
+        })
+      );
+    }
+
+    cardEl.appendChild(localFragment);
+    fxLayer.appendChild(screenFragment);
   }
 
   function handleAction(action) {
@@ -219,7 +328,7 @@
     var tapButton = createButton(scene.tapButtonText || "点亮好运", function () {
       current += 1;
       status.textContent = "好运值：" + current + "/" + target;
-      burstSpark(4);
+      burstSpark(8);
 
       if (current < target) {
         return;

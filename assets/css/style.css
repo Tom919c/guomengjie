@@ -24,6 +24,14 @@ body {
   padding: 20px 14px 28px;
 }
 
+.fx-layer {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 20;
+}
+
 .app-shell {
   width: 100%;
   max-width: 420px;
@@ -177,6 +185,15 @@ body {
 .float-item--soft {
   filter: blur(calc(var(--blur, 0px) + 0.8px))
     drop-shadow(0 8px 16px rgba(255, 122, 170, 0.34));
+}
+
+.float-item--fullscreen {
+  mix-blend-mode: screen;
+  filter: blur(var(--blur, 0px)) drop-shadow(0 10px 20px rgba(255, 112, 173, var(--glow, 0.46)));
+}
+
+.float-item--mega {
+  font-size: calc(var(--size, 22px) * 1.12);
 }
 
 @keyframes card-glow {
