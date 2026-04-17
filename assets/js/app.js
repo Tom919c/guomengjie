@@ -32,14 +32,14 @@
       step: 1,
       tag: "神秘信封",
       title: "给 {recipientName} 的考前惊喜",
-      text: "距离{examName}越来越近啦。\n我想在你冲刺前，先塞给你一点点好运和勇气。",
+      text: "今天是2026年4月17日，距离{examName}考试还有 1 天。\n我想在你冲刺前，先塞给你一点点好运和勇气。",
       choices: [{ label: "拆开看看", next: "mood" }]
     },
     mood: {
       step: 1,
       tag: "状态确认",
       title: "今天你是什么状态？",
-      text: "选一个最像你现在的按钮，我们继续往下走。",
+      text: "选一个最像你现在状态的按钮哦",
       choices: [
         { label: "我有点紧张", next: "nervous" },
         { label: "我斗志拉满", next: "confident" }
@@ -56,7 +56,7 @@
       step: 2,
       tag: "战力强化",
       title: "气势很好，继续保持",
-      text: "这种专注和执行力真的很帅。\n把这个状态带进考场，结果会很漂亮。",
+      text: "这种专注和执行力帅呆了哦。\n把这个状态带进考场，结果会很漂亮。",
       choices: [{ label: "继续，点满好运", next: "tapLuck" }]
     },
     tapLuck: {
